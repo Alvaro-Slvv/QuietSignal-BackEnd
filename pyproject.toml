@@ -1,0 +1,30 @@
+[project]
+name = "quietsignal-backend"
+version = "0.1.0"
+description = "Backend for QuietSignal mood diary"
+readme = "README.md"
+authors = [
+    { name = "Alvaro Silva", email = "102283382+BabyScylla69@users.noreply.github.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "python-dotenv",
+    "passlib[bcrypt]",
+    "PyJWT",
+    "joblib",
+    "scikit-learn",
+    "sqlalchemy",
+]
+
+# Tell uv/setuptools where the package lives
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+quietsignal-backend = { path = "." }
+
+[build-system]
+requires = ["uv_build>=0.9.11,<0.10.0"]
+build-backend = "uv_build"

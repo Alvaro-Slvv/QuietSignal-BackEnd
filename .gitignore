@@ -1,0 +1,77 @@
+# ------------------------
+# Python / general
+# ------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.dll
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Byte-compiled / optimized / DLL files
+*.pyc
+*.pyd
+*.pyo
+*.pyd
+*.pdb
+*.pyd
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# Logs
+*.log
+logs/
+log/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# ------------------------
+# Project-specific
+# ------------------------
+
+# SQLite DB (generated at runtime)
+mood_diary.db
+
+# Environment / secrets
+.env
+.env.*
+!.env.example   # keep a template if you add one
+
+# Models directory cache (keep the joblib file but not temp stuff)
+models/*.tmp
+models/*.bak
+
+# VS Code / IDEs
+.vscode/
+.idea/
+*.iml
+
+# pytest / coverage (if you add tests later)
+.pytest_cache/
+.coverage
+htmlcov/
+.coverage.*
+
+# MyPy / type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Ruff / lint
+.ruff_cache/
