@@ -1,24 +1,22 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from ..models import AnalyzeRequest, AnalyzeResponse, User
-from ..sentiment import sentiment_model
-from .auth_routes import get_current_user
 from ..database import get_db
+from ..models import AnalyzeRequest, AnalyzeResponse
+from ..ml.ml import predict_emotion  # <-- import ML
 
-router = APIRouter(prefix="/analyze", tags=["analysis"])
-
+router = APIRouter(prefix="/analyze", tags=["analyze"])
 
 @router.post("/", response_model=AnalyzeResponse)
-def analyze_text(
-    request: AnalyzeRequest,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    label = sentiment_model.predict(request.text)
-    probs = sentiment_model.predict_proba(request.text)
+def analyze_text(request: AnalyzeRequest, db: Session = Depends(get_db)):
+
+    text = request.text
+
+    clean_probs = predict_emotion(text)
+
+    label = max(clean_probs, key=clean_probs.get)
 
     return AnalyzeResponse(
         label=label,
-        probabilities=probs,
+        probabilities=clean_probs,
     )

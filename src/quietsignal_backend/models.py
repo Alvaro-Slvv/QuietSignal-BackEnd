@@ -5,17 +5,12 @@ from sqlalchemy import Column, Integer, String
 
 from .database import Base
 
-# --- SQLAlchemy model ---
-
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
-
-
-# --- Pydantic schemas ---
 
 
 class UserRegisterRequest(BaseModel):
@@ -34,9 +29,8 @@ class TokenResponse(BaseModel):
 
 
 class AnalyzeRequest(BaseModel):
-    text: str = Field(..., min_length=1)
-
+    text: str
 
 class AnalyzeResponse(BaseModel):
     label: str
-    probabilities: Optional[Dict[str, float]] = None
+    probabilities: Dict[str, float]
