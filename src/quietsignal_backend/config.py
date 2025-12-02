@@ -1,22 +1,19 @@
-# src/quietsignal_backend/config.py
-
 from datetime import timedelta
 from functools import lru_cache
-
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    # Auth / JWT
+    # JWT
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
-    # MySQL parts from .env
+    # MySQL pieces (from .env)
     mysql_user: str
     mysql_password: str
-    mysql_host: str
-    mysql_port: int
+    mysql_host: str = "localhost"
+    mysql_port: int = 3306
     mysql_db: str
 
     class Config:

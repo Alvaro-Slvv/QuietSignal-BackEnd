@@ -1,21 +1,32 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from .routes import auth_routes, analyze_routes
 from .database import Base, engine
 
-# Create tables at startup (MVP)
-Base.metadata.create_all(bind=engine)
+from .api.routers.authRoutes import router as authRouter
+from .api.routers.analyzeRoutes import router as analyzrouter
+from .api.routers.userRoutes import router as userRouter
 
-app = FastAPI(
-    title="QuietSignal Mood Diary API",
-    version="0.1.0",
-    description="MVP backend with auth + sentiment analysis",
+app = FastAPI(title="QuietSignal - Mood Diary (Modular DAO MVP)")
+
+# CORS (dev)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-app.include_router(auth_routes.router)
-app.include_router(analyze_routes.router)
+# include routers
+app.include_router(authRouter)
+app.include_router(analyzrouter)
+app.include_router(userRouter)
+
+# create tables for dev
+Base.metadata.create_all(bind=engine)
 
 
 @app.get("/")
 def read_root():
-    return {"message": "QuietSignal API is running"}
+    return {"status": "ok", "app": "QuietSignal Mood Diary API (modular)"}
