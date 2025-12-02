@@ -77,4 +77,4 @@ dmypy.json
 .ruff_cache/
 
 # models
-.joblib
+*.joblib
