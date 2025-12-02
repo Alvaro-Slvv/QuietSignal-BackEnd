@@ -9,10 +9,9 @@ from .api.routers.userRoutes import router as userRouter
 
 app = FastAPI(title="QuietSignal - Mood Diary (Modular DAO MVP)")
 
-# CORS (dev)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
