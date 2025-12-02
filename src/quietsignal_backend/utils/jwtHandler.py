@@ -1,17 +1,27 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 import jwt
 
 from ..config import settings
 
-def create_access_token(data: dict, expires_delta: Optional[int] = None) -> str:
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + (settings.access_token_expires)
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=60))
     to_encode.update({"exp": expire})
-    token = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
-    return token
+
+    encoded_jwt = jwt.encode(
+        to_encode, 
+        settings.JWT_SECRET, 
+        algorithm=settings.JWT_ALGORITHM
+    )
+
+    return encoded_jwt, expire
 
 
-def decode_access_token(token: str) -> dict:
-    payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-    return payload
+def decode_token(token: str):
+    return jwt.decode(
+        token,
+        settings.JWT_SECRET,
+        algorithms=[settings.JWT_ALGORITHM],
+    )
