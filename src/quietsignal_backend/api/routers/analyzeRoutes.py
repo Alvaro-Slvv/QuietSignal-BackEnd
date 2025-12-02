@@ -9,4 +9,4 @@ service = AnalyzeService()
 
 @router.post("/", response_model=AnalyzeResponseDTO)
 async def analyze(request: AnalyzeRequestDTO, db: Session = Depends(get_db)):
-    return service.analyze(request, db)
+    return service.analyze(request)

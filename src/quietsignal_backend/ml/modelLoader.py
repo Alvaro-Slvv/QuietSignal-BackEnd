@@ -2,7 +2,7 @@ import joblib
 from pathlib import Path
 from fastapi import HTTPException
 
-MODEL_PATH = Path(__file__).resolve().parent.parent.parent / "models" / "Model.joblib"
+MODEL_PATH = Path(__file__).resolve().parents[3] / "mlmodel" / "Model.joblib"
 
 try:
     MODEL = joblib.load(MODEL_PATH)
