@@ -1,8 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from .database import Base, engine
+
+from .common.apiResponse import APIResponse
+from fastapi.responses import JSONResponse
 
 from .api.routers.authRoutes import router as authRouter
 from .api.routers.analyzeRoutes import router as analyzrouter
@@ -15,6 +18,16 @@ async def lifespan(app: FastAPI):
     yield 
 app = FastAPI(title="QuietSignal - Mood Diary (Modular DAO MVP)")
 
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=APIResponse.error(
+            message=exc.detail,
+            code=exc.status_code
+        ).model_dump()
+    )
 
 app.add_middleware(
     CORSMiddleware,
