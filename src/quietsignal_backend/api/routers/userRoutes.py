@@ -15,5 +15,5 @@ def create_user(user_in: UserCreateDTO, db: Session = Depends(get_db)):
 
 
 @router.get("/me", response_model=UserOutDTO)
-def me(user=Depends(get_current_user)):
+def me(user=Depends(get_current_user)): # if admin admin_user = Depends(require_role("admin"))
     return UserOutDTO.model_validate(user)

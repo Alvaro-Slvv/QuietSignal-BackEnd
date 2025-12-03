@@ -1,13 +1,15 @@
 from datetime import timedelta
 from functools import lru_cache
 from pydantic_settings import BaseSettings
+from pydantic import Field
 
 
 class Settings(BaseSettings):
     # JWT
-    JWT_SECRET: str
+    JWT_SECRET_KEY: str 
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_MINUTES: int = 60
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     # MySQL pieces (from .env)
     mysql_user: str
@@ -17,6 +19,7 @@ class Settings(BaseSettings):
     mysql_db: str
 
     class Config:
+        extra = "ignore"
         env_file = ".env"
         env_file_encoding = "utf-8"
 
