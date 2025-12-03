@@ -4,21 +4,23 @@ from sqlalchemy.orm import Session
 
 from ...database import get_db
 from ...services.authService import AuthService
-from ...models.dto.userDTO import TokenResponseDTO, UserCreateDTO
+from ...models.dto.userDTO import TokenResponseDTO, UserCreateDTO, UserOutDTO
 from ...models.dao.userDAO import UserDAO
+from ...utils.security import hash_password 
 
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
-@router.post("/register")
+@router.post("/register", response_model=UserOutDTO)
 def register(user_data: UserCreateDTO, db: Session = Depends(get_db)):
-    existing_user = UserDAO.get_by_username(db, user_data.username)
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Username already exists")
-
-    created_user = UserDAO.create_user(db, user_data)
-    return {"message": "User registered successfully", "user_id": created_user.id}
-
+    if UserDAO.get_by_username(db, user_data.username):
+        raise HTTPException(status_code=400, detail="Username already taken")
+    if UserDAO.get_by_email(db, user_data.email):
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    hashed_pw = hash_password(user_data.password)          
+    created_user = UserDAO.create(db, dto=user_data, hashed_password=hashed_pw)
+    return created_user
 
 
 @router.post("/login", response_model=TokenResponseDTO)
