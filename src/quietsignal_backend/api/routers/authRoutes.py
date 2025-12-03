@@ -12,7 +12,10 @@ from ...utils.security import hash_password
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/register", response_model=UserOutDTO)
-def register(user_data: UserCreateDTO, db: Session = Depends(get_db)):
+def register(
+    user_data: UserCreateDTO, 
+    db: Session = Depends(get_db)
+):
     if UserDAO.get_by_username(db, user_data.username):
         raise HTTPException(status_code=400, detail="Username already taken")
     if UserDAO.get_by_email(db, user_data.email):
