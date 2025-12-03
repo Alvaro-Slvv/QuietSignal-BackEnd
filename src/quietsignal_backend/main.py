@@ -1,13 +1,20 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
 from .database import Base, engine
 
 from .api.routers.authRoutes import router as authRouter
 from .api.routers.analyzeRoutes import router as analyzrouter
 from .api.routers.userRoutes import router as userRouter
+from .database.dbInitializer import initialize_database
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    initialize_database()
+    yield 
 app = FastAPI(title="QuietSignal - Mood Diary (Modular DAO MVP)")
+
 
 app.add_middleware(
     CORSMiddleware,

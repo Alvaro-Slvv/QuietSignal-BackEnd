@@ -4,52 +4,42 @@ from sqlalchemy.orm import Session
 
 from ...database import get_db
 from ...services.authService import AuthService
-from ...models.dto.userDTO import TokenResponseDTO, UserCreateDTO, UserOutDTO
-from ...models.dao.userDAO import UserDAO
-from ...utils.security import hash_password 
-
+from ...models.dto.userDTO import TokenResponseDTO, UserCreateDTO, UserOutDTO, LoginRequestDTO
+from ..deps import get_current_user, get_current_user_or_none
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/register", response_model=UserOutDTO)
 def register(user_data: UserCreateDTO, db: Session = Depends(get_db)):
-    if UserDAO.get_by_username(db, user_data.username):
-        raise HTTPException(status_code=400, detail="Username already taken")
-    if UserDAO.get_by_email(db, user_data.email):
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    hashed_pw = hash_password(user_data.password)          
-    created_user = UserDAO.create(db, dto=user_data, hashed_password=hashed_pw)
-    return created_user
+    return AuthService.register(db, user_data)
 
 
 @router.post("/login", response_model=TokenResponseDTO)
-def login(
-    response: Response,
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
-):
-    result = AuthService.authenticate(db, form_data.username, form_data.password)
-
+def login(response: Response, login_data: LoginRequestDTO, db: Session = Depends(get_db)):
+    result = AuthService.authenticate(db, login_data.username, login_data.password)
     if not result:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
-
     token, user = result
 
+    # Set cookie - adjust secure=True for HTTPS in prod
     response.set_cookie(
         key="access_token",
         value=token,
         httponly=True,
-        secure=False,   # True in production HTTPS
+        secure=False,
         samesite="lax",
-        max_age=3600,
-        path="/",
+        max_age=60*60*24  # optional
     )
-
     return TokenResponseDTO(access_token=token)
 
 
 @router.post("/logout")
 def logout(response: Response):
     response.delete_cookie("access_token")
-    return {"message": "Logged out"}
+    return {"msg": "logged out"}
+
+@router.get("/me", response_model=UserOutDTO)
+def me(user = Depends(get_current_user_or_none)):
+    if user is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    return user
