@@ -12,7 +12,7 @@ service = AnalyzeService()
 @router.post("/", response_model=dict)
 async def analyze(request: AnalyzeRequestDTO, db: Session = Depends(get_db)):
     try:
-        result = service.analyze(request, db)
+        result = service.analyze(request)
 
         # result is expected: { "label": str, "probabilities": dict }
         return {
