@@ -1,3 +1,8 @@
+# Description
+QuietSignal is a FastAPI-powered mental-wellbeing backend that lets users create journals, store entries, and analyze their emotional content using a machine-learning model.
+It provides secure authentication, role-based access control, and an AI-driven sentiment engine for multi-paragraph analysis.
+Designed for simplicity and reliability, QuietSignal offers clean endpoints for journaling workflows, user management, and admin maintenance tasks.
+
 ## Basic instructions
 download pfdata.zip, 
 add the .env to the project root
@@ -60,4 +65,5 @@ uv run uvicorn quietsignal_backend.main:app --reload
 |Method | Route | Description|
 |-------|-------|-------------|
 |GET | / | Root health check endpoint|
+
 
