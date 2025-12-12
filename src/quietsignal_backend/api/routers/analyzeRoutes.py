@@ -11,8 +11,8 @@ service = AnalyzeService()
 
 
 @router.post("/", response_model=APIResponse)
-async def analyze(request: AnalyzeRequestDTO, db: Session = Depends(get_db)):
-    try:
+async def analyze(request: AnalyzeRequestDTO):
+    try:        
         result = service.analyze(request)
         return APIResponse.success(
             data=result,

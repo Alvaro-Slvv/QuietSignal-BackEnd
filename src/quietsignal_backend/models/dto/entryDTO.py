@@ -1,14 +1,18 @@
-from pydantic import BaseModel, Field
-from typing import List, Dict, Optional
+from pydantic import BaseModel
+from typing import List, Dict
 
 
 class EntryCreateResponseDTO(BaseModel):
-    entry_id: int = Field(..., description="ID of the newly created entry")
+    entry_id: int
+
+
+class EntryAppendBatchDTO(BaseModel):
+    paragraphs: List[str]
 
 
 class EntryDTO(BaseModel):
     entry_id: int
     texts: List[str]
-    label: Optional[str] = None
-    probabilities: Optional[Dict[str, float]] = None
+    label: str
+    probabilities: Dict[str, float]
     created_at: str
