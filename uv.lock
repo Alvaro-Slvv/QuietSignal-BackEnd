@@ -549,12 +549,16 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "pyjwt" },
     { name = "pymysql" },
-    { name = "pytest" },
     { name = "python-dotenv" },
     { name = "python-multipart" },
     { name = "scikit-learn" },
     { name = "sqlalchemy" },
     { name = "uvicorn", extra = ["standard"] },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "pytest" },
 ]
 
 [package.metadata]
@@ -568,13 +572,14 @@ requires-dist = [
     { name = "pydantic-settings", specifier = ">=2.12.0" },
     { name = "pyjwt" },
     { name = "pymysql", specifier = ">=1.1.2" },
-    { name = "pytest", specifier = ">=9.0.2" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=9.0.2" },
     { name = "python-dotenv" },
     { name = "python-multipart", specifier = ">=0.0.20" },
     { name = "scikit-learn" },
     { name = "sqlalchemy" },
     { name = "uvicorn", extras = ["standard"] },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "scikit-learn"
