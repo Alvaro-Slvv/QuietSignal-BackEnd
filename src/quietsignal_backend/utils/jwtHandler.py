@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 import jwt
 from jwt.exceptions import PyJWTError
 
-from ..config import settings
+from ..settings import settings
 
 SECRET_KEY = settings.JWT_SECRET_KEY
 ALGORITHM = settings.JWT_ALGORITHM

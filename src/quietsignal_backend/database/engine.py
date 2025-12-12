@@ -1,30 +1,30 @@
-from sqlalchemy import create_engine, text
-from sqlalchemy.engine.url import make_url
-from ..config import settings
+import mysql.connector
+from sqlalchemy import create_engine
+from quietsignal_backend.settings import settings
 
-DATABASE_URL = settings.DATABASE_URL   # "mysql+mysqlconnector://user:pass@localhost:3306/quietsignal"
 
-# Parse DSN
-url = make_url(DATABASE_URL)
+def ensure_database_exists():
+    """
+    Ensures the MySQL database exists BEFORE SQLAlchemy connects.
+    """
+    conn = mysql.connector.connect(
+        host=settings.MYSQL_HOST,
+        user=settings.MYSQL_USER,
+        password=settings.MYSQL_PASSWORD
+    )
+    cursor = conn.cursor()
+    cursor.execute(f"CREATE DATABASE IF NOT EXISTS {settings.MYSQL_DB}")
+    conn.commit()
+    cursor.close()
+    conn.close()
 
-# Build server URL WITHOUT database
-server_url = (
-    f"{url.drivername}://{url.username}:{url.password}@{url.host}:{url.port}/"
+
+# Ensure DB before SQLAlchemy connects
+ensure_database_exists()
+
+# SQLAlchemy Engine
+engine = create_engine(
+    settings.DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=3600,
 )
-
-# Create engine WITHOUT database (server-level)
-server_engine = create_engine(server_url, isolation_level="AUTOCOMMIT")
-
-
-def ensure_database():
-    db_name = url.database
-
-    with server_engine.connect() as conn:
-        conn.execute(text(f"CREATE DATABASE IF NOT EXISTS `{db_name}`"))
-
-
-# Create DB before regular engine is made
-ensure_database()
-
-# Now the real engine WITH the database
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
