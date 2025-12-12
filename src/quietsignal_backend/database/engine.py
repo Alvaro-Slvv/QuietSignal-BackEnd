@@ -16,12 +16,15 @@ def ensure_database_exists():
         user=settings.MYSQL_USER,
         password=settings.MYSQL_PASSWORD
     )
-    cursor = conn.cursor()
-    cursor.execute(f"CREATE DATABASE IF NOT EXISTS {settings.MYSQL_DB}")
-    conn.commit()
-    cursor.close()
-    conn.close()
-
+    try:
+        cursor = conn.cursor()
+        try:
+            cursor.execute(f"CREATE DATABASE IF NOT EXISTS {settings.MYSQL_DB}")
+            conn.commit()
+        finally:
+            cursor.close()
+    finally:
+        conn.close()
 
 # Ensure DB before SQLAlchemy connects
 ensure_database_exists()

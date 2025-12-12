@@ -97,8 +97,8 @@ def recalculate_all_entries(user = Depends(get_current_user), db: Session = Depe
         try:
             texts = json.loads(e.texts) if e.texts else []
             label, probs = _analyze_texts_weighted(texts)
-            JournalEntryDAO.update_analysis(db, e, label, json.dumps(probs))
-            updated_count += 1
+            JournalEntryDAO.update_emotion(db, e, label, probs)
+            updated_count += 1        
         except Exception as ex:
             errors.append({"entry_id": getattr(e, "id", None), "error": str(ex)})
 

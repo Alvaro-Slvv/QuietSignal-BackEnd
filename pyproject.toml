@@ -22,6 +22,10 @@ dependencies = [
     "jose>=1.0.0",
     "mysql-connector-python>=9.5.0",
     "pydantic[email]>=2.12.5",
+]
+
+[project.optional-dependencies]
+dev = [
     "pytest>=9.0.2",
 ]
 

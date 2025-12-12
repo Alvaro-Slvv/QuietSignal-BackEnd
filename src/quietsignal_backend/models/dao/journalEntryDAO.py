@@ -46,3 +46,15 @@ class JournalEntryDAO:
             .order_by(JournalEntry.created_at.asc())
             .all()
         )
+
+    @staticmethod
+    def list_all(db: Session):
+        return db.query(JournalEntry).all()
+
+    @staticmethod
+    def update_analysis(db: Session, entry: JournalEntry, label: str, probs_json: str):
+        entry.label = label
+        entry.probabilities = probs_json
+        db.commit()
+        db.refresh(entry)
+        return entry

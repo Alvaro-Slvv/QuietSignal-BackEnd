@@ -1,6 +1,6 @@
 # src/quietsignal_backend/api/routers/journalRoutes.py
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.orm import Session
 import json
 from typing import Any
@@ -97,7 +97,11 @@ def analyzer_callable(texts: list[str]):
     for t in texts:
         raw = predict_emotion(t)
         # model returns {"0":..,"1":..,"2":..} or similar numeric keys
-        mapped = {EMOTION_LABELS[int(i)]: float(prob) for i, prob in raw.items()}
+        try:
+            mapped = {EMOTION_LABELS[int(i)]: float(prob) for i, prob in raw.items()}
+        except (IndexError, ValueError, KeyError):
+            # fallback if model output format is unexpected
+            mapped = DEFAULT_PROBS.copy()
         paragraph_probs.append(mapped)
         lengths.append(max(1, len(t)))
 
@@ -146,7 +150,7 @@ def list_user_journals(
 # -----------------------------
 # Create journal
 # -----------------------------
-@router.post("/", response_model=APIResponse)
+@router.post("/", response_model=APIResponse, status_code=201)
 def create_journal(
     title: str,
     user=Depends(get_current_user),
@@ -161,7 +165,6 @@ def create_journal(
         )
     except Exception as e:
         return APIResponse.error(message=f"Create journal failed: {e}", code=500)
-
 
 # -----------------------------
 # Create Entry
@@ -190,7 +193,7 @@ def create_entry(
 def append_paragraph(
     journal_id: int,
     entry_id: int,
-    paragraph: str,
+    paragraph: str = Body(..., embed=True),
     user=Depends(get_current_user),
     db: Session = Depends(get_db),
 ):

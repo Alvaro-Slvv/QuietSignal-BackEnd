@@ -50,5 +50,6 @@ def ensure_admin_user():
     except Exception as e:
         print("[dbInitializer] ERROR creating admin user:", e)
         db.rollback()
+        raise  # Fail startup if admin creation fails
     finally:
         db.close()

@@ -7,6 +7,9 @@ from ...database import get_db
 from ...api.deps import get_current_user
 from ...common.apiResponse import APIResponse
 
+import logging
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
@@ -20,8 +23,9 @@ def create_user(user_in: UserCreateDTO, db: Session = Depends(get_db)):
             code=201,
         )
     except Exception as e:
+        logger.exception("User creation failed")
         return APIResponse.error(
-            message=f"User creation failed: {str(e)}",
+            message="User creation failed",
             code=500,
         )
 
