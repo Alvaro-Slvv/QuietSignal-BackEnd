@@ -5,34 +5,30 @@ from ...models.dto.userDTO import UserCreateDTO, UserOutDTO
 from ...services.userService import UserService
 from ...database import get_db
 from ...api.deps import get_current_user
+from ...common.apiResponse import APIResponse
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-@router.post("/")
+@router.post("/", response_model=APIResponse)
 def create_user(user_in: UserCreateDTO, db: Session = Depends(get_db)):
     try:
         user = UserService.create_user(db, user_in)
-        return {
-            "success": True,
-            "status_code": 201,
-            "message": "User created",
-            "data": UserOutDTO.model_validate(user),
-        }
+        return APIResponse.success(
+            data=UserOutDTO.model_validate(user),
+            message="User created",
+            code=201,
+        )
     except Exception as e:
-        return {
-            "success": False,
-            "status_code": 500,
-            "message": "User creation failed",
-            "errors": str(e),
-        }
+        return APIResponse.error(
+            message=f"User creation failed: {str(e)}",
+            code=500,
+        )
 
 
-@router.get("/me")
+@router.get("/me", response_model=APIResponse)
 def me(user=Depends(get_current_user)):
-    return {
-        "success": True,
-        "status_code": 200,
-        "message": "Fetched user",
-        "data": UserOutDTO.model_validate(user),
-    }
+    return APIResponse.success(
+        message="Fetched user",
+        data=UserOutDTO.model_validate(user),
+    )

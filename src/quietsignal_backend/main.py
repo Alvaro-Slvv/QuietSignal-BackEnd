@@ -1,51 +1,41 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
-from .database import Base, engine
+from quietsignal_backend.database import Base, engine
+from quietsignal_backend.database.dbInitializer import initialize_database
 
-from .common.apiResponse import APIResponse
-from fastapi.responses import JSONResponse
+# Routers
+from quietsignal_backend.api.routers.authRoutes import router as authRouter
+from quietsignal_backend.api.routers.userRoutes import router as userRouter
+from quietsignal_backend.api.routers.journalRoutes import router as journalRouter
+from quietsignal_backend.api.routers.analyzeRoutes import router as analyzeRouter
+from quietsignal_backend.api.routers.adminRoutes import router as adminRouter
 
-from .api.routers.authRoutes import router as authRouter
-from .api.routers.analyzeRoutes import router as analyzrouter
-from .api.routers.userRoutes import router as userRouter
-from .database.dbInitializer import initialize_database
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    print(">>> FastAPI lifespan starting...")
     initialize_database()
-    yield 
-app = FastAPI(title="QuietSignal - Mood Diary (Modular DAO MVP)")
+    print(">>> Startup complete.")
+    yield
+    print(">>> FastAPI lifespan shutting down...")
 
 
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request, exc: HTTPException):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content=APIResponse.error(
-            message=exc.detail,
-            code=exc.status_code
-        ).model_dump()
-    )
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+app = FastAPI(
+    title="QuietSignal Backend",
+    version="1.0.0",
+    lifespan=lifespan
 )
 
-# include routers
-app.include_router(authRouter)
-app.include_router(analyzrouter)
-app.include_router(userRouter)
+# Register routers
+app.include_router(authRouter, prefix="/auth", tags=["Auth"])
+app.include_router(userRouter, prefix="/users", tags=["Users"])
+app.include_router(journalRouter, prefix="/journals", tags=["Journals"])
+app.include_router(analyzeRouter, prefix="/analyze", tags=["Analyze"])
+app.include_router(adminRouter)
 
-# create tables for dev
-Base.metadata.create_all(bind=engine)
 
 
 @app.get("/")
-def read_root():
-    return {"status": "ok", "app": "QuietSignal Mood Diary API (modular)"}
+def root():
+    return {"message": "QuietSignal backend running"}

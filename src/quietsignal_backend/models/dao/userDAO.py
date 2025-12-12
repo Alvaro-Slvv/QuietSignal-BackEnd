@@ -13,12 +13,13 @@ class UserDAO:
         return db.query(User).filter(User.id == user_id).first()
 
     @staticmethod
-    def create(db: Session, dto: UserCreateDTO, hashed_password: str):
+    def create(db: Session, dto: UserCreateDTO, hashed_password: str, role: str = "user"):
         user = User(
             name=dto.name,
             username=dto.username,
             hashed_password=hashed_password,
-            email=dto.email
+            email=dto.email,
+            role=role
         )
         db.add(user)
         db.commit()
