@@ -23,7 +23,7 @@ QuietSignal runs in a lightweight, modern Python environment and supports all ma
 
 Follow these steps to set up the QuietSignal backend environment.  
 
-1. Clone the repositor
+1. Clone the repository
 ``` powershell
 git clone https://github.com/your-username/QuietSignal-BackEnd.git
 cd QuietSignal-BackEnd
@@ -104,6 +104,7 @@ uv run uvicorn quietsignal_backend.main:app --reload
 |Method | Route | Description|
 |-------|-------|-------------|
 |GET | / | Root health check endpoint|
+
 
 
 
