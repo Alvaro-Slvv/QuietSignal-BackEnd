@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, JSON
 from sqlalchemy.orm import relationship
 from ...database.base import Base
 
@@ -11,10 +11,10 @@ class JournalEntry(Base):
     journal_id = Column(Integer, ForeignKey("journals.id", ondelete="CASCADE"), nullable=False)
 
     # list of paragraphs stored as JSON string
-    texts = Column(Text, nullable=False, default="[]")
+    texts = Column(Text, nullable=False, default=list)
 
     # last analysis
     label = Column(String(32), nullable=True)
-    probabilities = Column(String(2048), nullable=True)
+    probabilities = Column(JSON, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

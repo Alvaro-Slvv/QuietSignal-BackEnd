@@ -28,10 +28,10 @@ app = FastAPI(
 )
 
 # Register routers
-app.include_router(authRouter, prefix="/auth", tags=["Auth"])
-app.include_router(userRouter, prefix="/users", tags=["Users"])
-app.include_router(journalRouter, prefix="/journals", tags=["Journals"])
-app.include_router(analyzeRouter, prefix="/analyze", tags=["Analyze"])
+app.include_router(authRouter)
+app.include_router(userRouter)
+app.include_router(journalRouter)
+app.include_router(analyzeRouter)
 app.include_router(adminRouter)
 
 

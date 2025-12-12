@@ -19,3 +19,7 @@ class JournalDAO:
     @staticmethod
     def list_for_user(db: Session, user_id: int) -> List[Journal]:
         return db.query(Journal).filter(Journal.user_id == user_id).all()
+    @staticmethod
+    def get_by_user(db: Session, user_id: int):
+        return db.query(Journal).filter(Journal.user_id == user_id).order_by(Journal.created_at.desc()).all()
+

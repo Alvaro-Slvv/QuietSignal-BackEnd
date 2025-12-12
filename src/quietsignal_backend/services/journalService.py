@@ -1,49 +1,47 @@
 import json
-from typing import Callable, Dict, Tuple, Optional
 from sqlalchemy.orm import Session
 
-from ..models.dao.journalDAO import JournalDAO
 from ..models.dao.journalEntryDAO import JournalEntryDAO
-from ..models.entities.journalEntryEntity import JournalEntry
+from ..models.dao.journalDAO import JournalDAO
 
 
 class JournalService:
 
     @staticmethod
     def create_journal(db: Session, user_id: int, title: str):
-        return JournalDAO.create(db, user_id=user_id, title=title)
+        return JournalDAO.create(db, user_id, title)
 
     @staticmethod
     def create_entry(db: Session, journal_id: int):
         return JournalEntryDAO.create(db, journal_id)
 
     @staticmethod
-    def append_and_analyze(
-        db: Session,
-        entry_id: int,
-        paragraph: str,
-        analyzer: Callable[[list[str]], Tuple[str, Dict[str, float]]]
-    ) -> Optional[JournalEntry]:
-
+    def append_and_analyze(db: Session, entry_id: int, paragraph: str, analyzer_callable):
         entry = JournalEntryDAO.get_by_id(db, entry_id)
         if not entry:
             return None
 
-        entry = JournalEntryDAO.append_paragraph(db, entry, paragraph)
+        JournalEntryDAO.append_paragraphs(db, entry, [paragraph])
 
         texts = json.loads(entry.texts)
+        label, probs = analyzer_callable(texts)
+        JournalEntryDAO.update_emotion(db, entry, label, probs)
 
-        # Weighted analysis
-        label, probs = analyzer(texts)
+        return entry
 
-        updated = JournalEntryDAO.update_analysis(
-            db,
-            entry,
-            label,
-            json.dumps(probs)
-        )
+    @staticmethod
+    def append_batch_and_analyze(db: Session, entry_id: int, paragraphs: list[str], analyzer_callable):
+        entry = JournalEntryDAO.get_by_id(db, entry_id)
+        if not entry:
+            return None
 
-        return updated
+        JournalEntryDAO.append_paragraphs(db, entry, paragraphs)
+
+        texts = json.loads(entry.texts)
+        label, probs = analyzer_callable(texts)
+        JournalEntryDAO.update_emotion(db, entry, label, probs)
+
+        return entry
 
     @staticmethod
     def get_entry(db: Session, entry_id: int):
@@ -51,4 +49,8 @@ class JournalService:
 
     @staticmethod
     def list_entries(db: Session, journal_id: int):
-        return JournalEntryDAO.list_for_journal(db, journal_id)
+        return JournalEntryDAO.list_by_journal(db, journal_id)
+    
+    @staticmethod
+    def list_user_journals(db: Session, user_id: int):
+        return JournalDAO.get_by_user(db, user_id)
