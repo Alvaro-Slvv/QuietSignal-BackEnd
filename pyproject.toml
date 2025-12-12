@@ -24,6 +24,11 @@ dependencies = [
     "pydantic[email]>=2.12.5",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.2",
+]
+
 # Tell uv/setuptools where the package lives
 [tool.uv]
 package = true

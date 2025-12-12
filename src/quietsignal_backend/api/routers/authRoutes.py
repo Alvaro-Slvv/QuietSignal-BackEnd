@@ -4,47 +4,42 @@ from sqlalchemy.orm import Session
 from ...database import get_db
 from ...services.authService import AuthService
 from ...models.dto.userDTO import (
-    TokenResponseDTO,
     UserCreateDTO,
     UserOutDTO,
     LoginRequestDTO,
 )
 from ..deps import get_current_user_or_none
+from ...common.apiResponse import APIResponse
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
-@router.post("/register")
+@router.post("/register", response_model=APIResponse)
 def register(user_data: UserCreateDTO, db: Session = Depends(get_db)):
     try:
         user = AuthService.register(db, user_data)
-        return {
-            "success": True,
-            "status_code": 201,
-            "message": "User registered successfully",
-            "data": UserOutDTO.model_validate(user),
-        }
+        return APIResponse.success(
+            data=UserOutDTO.model_validate(user),
+            message="User registered successfully",
+            code=201,
+        )
     except HTTPException as e:
-        return {
-            "success": False,
-            "status_code": e.status_code,
-            "message": "Registration failed",
-            "errors": e.detail,
-        }
+        return APIResponse.error(
+            message=e.detail,
+            code=e.status_code,
+        )
 
 
-@router.post("/login")
+@router.post("/login", response_model=APIResponse)
 def login(response: Response, login_data: LoginRequestDTO, db: Session = Depends(get_db)):
     try:
         result = AuthService.authenticate(db, login_data.username, login_data.password)
 
         if not result:
-            return {
-                "success": False,
-                "status_code": 401,
-                "message": "Incorrect username or password",
-                "errors": "Invalid credentials",
-            }
+            return APIResponse.error(
+                message="Incorrect username or password",
+                code=401,
+            )
 
         token, user = result
 
@@ -57,48 +52,36 @@ def login(response: Response, login_data: LoginRequestDTO, db: Session = Depends
             max_age=60 * 60 * 24,
         )
 
-        return {
-            "success": True,
-            "status_code": 200,
-            "message": "Login successful",
-            "data": {
+        return APIResponse.success(
+            message="Login successful",
+            data={
                 "access_token": token,
                 "user": UserOutDTO.model_validate(user),
             },
-        }
+        )
 
     except Exception as e:
-        return {
-            "success": False,
-            "status_code": 500,
-            "message": "Login error",
-            "errors": str(e),
-        }
+        return APIResponse.error(
+            message=f"Login error: {str(e)}",
+            code=500,
+        )
 
 
-@router.post("/logout")
+@router.post("/logout", response_model=APIResponse)
 def logout(response: Response):
     response.delete_cookie("access_token")
-    return {
-        "success": True,
-        "status_code": 200,
-        "message": "Logged out",
-    }
+    return APIResponse.success(message="Logged out")
 
 
-@router.get("/me")
+@router.get("/me", response_model=APIResponse)
 def me(user=Depends(get_current_user_or_none)):
     if not user:
-        return {
-            "success": False,
-            "status_code": 401,
-            "message": "Not authenticated",
-            "data": None,
-        }
+        return APIResponse.error(
+            message="Not authenticated",
+            code=401,
+        )
 
-    return {
-        "success": True,
-        "status_code": 200,
-        "message": "Fetched user",
-        "data": UserOutDTO.model_validate(user),
-    }
+    return APIResponse.success(
+        message="Fetched user",
+        data=UserOutDTO.model_validate(user),
+    )
