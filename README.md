@@ -3,21 +3,60 @@ QuietSignal is a FastAPI-powered mental-wellbeing backend that lets users create
 It provides secure authentication, role-based access control, and an AI-driven sentiment engine for multi-paragraph analysis.
 Designed for simplicity and reliability, QuietSignal offers clean endpoints for journaling workflows, user management, and admin maintenance tasks.
 
-## Basic instructions
-download pfdata.zip, 
-add the .env to the project root
-and the Model.joblib to root/mlmodel 
-> **_NOTE:_** change the .env database credentials  
+# Environment Requirements
+QuietSignal runs in a lightweight, modern Python environment and supports all major operating systems.
 
-Run this to install dependencies
+***Operating System:*** Windows 10/11  
+
+***Programming Language:*** Python 3.10 – 3.12 (recommended: Python 3.11)  
+
+***Package & Environment Management:*** uv  
+
+**Database:** MySQL 8.0+ (local or cloud)  
+
+**Model File**  
+> [!IMPORTANT]
+>Requires the ML model file at:
+>mlmodel/Model.joblib  
+
+# Installation
+
+Follow these steps to set up the QuietSignal backend environment.  
+
+1. Clone the repositor
+``` powershell
+git clone https://github.com/your-username/QuietSignal-BackEnd.git
+cd QuietSignal-BackEnd
 ```
+2. Sync the dependencies and create the virtual enviorment
+``` powershell
 uv sync
 ```
+3. Prepare enviorment variables (if hosting in local)
+``` powershell
+# this is an example .env
+# JWT
+JWT_SECRET_KEY=JWTSECRETKEY
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
 
-Then run this to start the api
+# MySQL
+MYSQL_USER=USER
+MYSQL_PASSWORD=PASSWORD
+MYSQL_HOST=HOST
+MYSQL_PORT=PORT
+MYSQL_DB=quietsignal
+
+ADMIN_EMAIL=ADMIN@ADMIN.com
+ADMIN_PASSWORD=ADMINPASSWORD
+ADMIN_NAME="ADMIN"
 ```
+# Run Instructions
+run the following
+``` powershell
 uv run uvicorn quietsignal_backend.main:app --reload
 ```
+
 # API ROUTES
 ## AUTH ROUTES ***/auth***
 |Method | Route | Description |
@@ -65,5 +104,6 @@ uv run uvicorn quietsignal_backend.main:app --reload
 |Method | Route | Description|
 |-------|-------|-------------|
 |GET | / | Root health check endpoint|
+
 
 
