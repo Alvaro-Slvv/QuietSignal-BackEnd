@@ -12,6 +12,13 @@ class JournalService:
         return JournalDAO.create(db, user_id, title)
 
     @staticmethod
+    def get_user_journal(db: Session, user_id: int):
+        journals = JournalDAO.get_by_user(db, user_id)
+        if journals:
+            return journals[0]
+        return None
+
+    @staticmethod
     def create_entry(db: Session, journal_id: int):
         return JournalEntryDAO.create(db, journal_id)
 

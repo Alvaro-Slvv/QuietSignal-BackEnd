@@ -165,7 +165,6 @@ def create_journal(
         )
     except Exception as e:
         return APIResponse.error(message=f"Create journal failed: {e}", code=500)
-
 # -----------------------------
 # Create Entry
 # -----------------------------
@@ -328,3 +327,20 @@ def list_entries(
         out.append(dto.model_dump())
 
     return APIResponse.success(data=out, message="Entries listed")
+
+@router.get("/me", response_model=APIResponse)
+def get_my_journal(
+    user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    journal = JournalService.get_user_journal(db, user.id)
+    if not journal:
+        raise HTTPException(status_code=404, detail="Journal not found")
+
+    return APIResponse.success(
+        data={
+            "journal_id": journal.id,
+            "title": journal.title,
+            "created_at": journal.created_at.isoformat(),
+        }
+    )
