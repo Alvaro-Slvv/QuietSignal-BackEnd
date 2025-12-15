@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
 
 from quietsignal_backend.database import Base, engine
 from quietsignal_backend.database.dbInitializer import initialize_database
@@ -27,13 +28,31 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# ----------------------------
+# CORS Middleware
+# ----------------------------
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    # puedes añadir otros dominios de frontend si es necesario
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ----------------------------
 # Register routers
+# ----------------------------
 app.include_router(authRouter)
 app.include_router(userRouter)
 app.include_router(journalRouter)
 app.include_router(analyzeRouter)
 app.include_router(adminRouter)
-
 
 
 @app.get("/")
