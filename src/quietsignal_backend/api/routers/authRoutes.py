@@ -1,7 +1,9 @@
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 
 from ...database import get_db
+from ...services.journalService import JournalService
 from ...services.authService import AuthService
 from ...models.dto.userDTO import (
     UserCreateDTO,
@@ -18,17 +20,24 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 def register(user_data: UserCreateDTO, db: Session = Depends(get_db)):
     try:
         user = AuthService.register(db, user_data)
+
+        JournalService.create_journal(
+            db=db,
+            user_id=user.id,
+            title=f"{user.username} Journal"
+        )
+
         return APIResponse.success(
             data=UserOutDTO.model_validate(user),
             message="User registered successfully",
             code=201,
         )
+
     except HTTPException as e:
         return APIResponse.error(
             message=e.detail,
             code=e.status_code,
         )
-
 
 @router.post("/login", response_model=APIResponse)
 def login(response: Response, login_data: LoginRequestDTO, db: Session = Depends(get_db)):
